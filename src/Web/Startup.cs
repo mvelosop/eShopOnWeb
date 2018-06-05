@@ -45,7 +45,7 @@ namespace Microsoft.eShopWeb
                 try
                 {
                     //c.UseInMemoryDatabase("Catalog");
-                    c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection"));
+                    c.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
 
                     c.ConfigureWarnings(wb =>
                     {
@@ -63,7 +63,7 @@ namespace Microsoft.eShopWeb
             services.AddDbContext<AppIdentityDbContext>(options =>
             {
                 //options.UseInMemoryDatabase("Identity");
-                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection"));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
