@@ -44,8 +44,9 @@ namespace Microsoft.eShopWeb
             {
                 try
                 {
-                    c.UseInMemoryDatabase("Catalog");
-                    //c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection"));
+                    //c.UseInMemoryDatabase("Catalog");
+                    c.UseSqlServer(Configuration.GetConnectionString("CatalogConnection"));
+
                     c.ConfigureWarnings(wb =>
                     {
                         //By default, in this application, we don't want to have client evaluations
@@ -60,8 +61,10 @@ namespace Microsoft.eShopWeb
 
             // Add Identity DbContext
             services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseInMemoryDatabase("Identity"));
-                //options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
+            {
+                //options.UseInMemoryDatabase("Identity");
+                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection"));
+            });
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppIdentityDbContext>()
@@ -127,6 +130,16 @@ namespace Microsoft.eShopWeb
             app.UseIdentity();
 
             app.UseMvc();
+
+            // Migrate databases
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var catalogContext = scope.ServiceProvider.GetService<CatalogContext>();
+                var identityContext = scope.ServiceProvider.GetService<AppIdentityDbContext>();
+
+                catalogContext.Database.Migrate();
+                identityContext.Database.Migrate();
+            }
         }
 
         public void ConfigureDevelopment(IApplicationBuilder app,
